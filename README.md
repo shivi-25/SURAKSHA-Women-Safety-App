@@ -5,4 +5,4 @@ User can also use emergency calls button for three emegency numbers- Ambulance n
 
 Contacts are saved using Database Handler. For calling used ACTION_CALL action.SmsManager object to send an SMS to the given mobile numbers.
  
-Recording is also uploaded for each functionality. SMS is not showing because emulator is not supporting the sms functionality but it will work correctly on android phones.
+Recording is also uploaded for each functionality. SMS is not showing because emulator is not supporting the sms functionality but it is working correctly on android phones.
