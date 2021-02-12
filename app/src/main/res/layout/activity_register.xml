@@ -14,7 +14,7 @@
         <EditText
             android:id="@+id/phone"
             android:layout_width="wrap_content"
-            android:layout_height="50dp"
+            android:layout_height="55dp"
             android:layout_gravity="center"
             android:layout_margin="65dp"
             android:hint="ENTER PHONE NUMBER" />

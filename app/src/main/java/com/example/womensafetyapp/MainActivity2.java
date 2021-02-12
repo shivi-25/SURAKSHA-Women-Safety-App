@@ -7,6 +7,7 @@ import androidx.core.app.TaskStackBuilder;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -18,6 +19,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.telephony.SmsManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -31,7 +33,7 @@ import static android.Manifest.permission.CALL_PHONE;
 
 public class MainActivity2 extends AppCompatActivity {
 
-    Button b1,b2;
+    Button b1,b2,b3,b4;
     private FusedLocationProviderClient client;
     DatabaseHandler myDB;
     private final int REQUEST_CHECK_CODE= 8989;
@@ -49,6 +51,9 @@ public class MainActivity2 extends AppCompatActivity {
 
         b1=findViewById(R.id.button);
         b2=findViewById(R.id.button2);
+        b3=findViewById(R.id.police);
+        b4=findViewById(R.id.call);
+
         myDB= new DatabaseHandler(this);
         locationManager= (LocationManager) getSystemService(LOCATION_SERVICE);
         if(! locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER)){
@@ -74,11 +79,24 @@ public class MainActivity2 extends AppCompatActivity {
         b2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadData();
+                //loadData();
+                 call();
+            }
+        });
+        b3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                police_call();
+            }
+        });
+        b4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(),Calls.class);
+                startActivity(i);
             }
         });
     }
-
     private void loadData() {
         ArrayList<String> thelist = new ArrayList<>( );
         Cursor data=myDB.getListContents();
@@ -93,18 +111,19 @@ public class MainActivity2 extends AppCompatActivity {
             {
                 thelist.add(data.getString(1));
                 number = number+data.getString(1)+ (data.isLast()?"":";");
-                call();
+
             }
            if(!thelist.isEmpty())
            {
                sendSms(number,msg,true);
-
            }
         }
+        Toast.makeText(this, "bye", Toast.LENGTH_SHORT).show();
     }
 
     private void sendSms(String number, String msg, boolean b) {
-        Intent smsintent =new Intent(Intent.ACTION_SENDTO);
+
+       Intent smsintent =new Intent(Intent.ACTION_SENDTO);
         Uri.parse("smsto:"+number);
         smsintent.putExtra("smsbody",msg);
         startActivity(smsintent);
@@ -114,6 +133,18 @@ public class MainActivity2 extends AppCompatActivity {
     private void call() {
         Intent i =new Intent (Intent.ACTION_CALL);
         i.setData(Uri.parse("tel:1000"));
+        if(ContextCompat.checkSelfPermission(getApplicationContext(),CALL_PHONE)== PackageManager.PERMISSION_GRANTED){
+            startActivity(i);
+        }
+        else {
+            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
+                requestPermissions(new String[]{CALL_PHONE}, 1);
+            }
+        }
+    }
+    private void police_call() {
+        Intent i =new Intent (Intent.ACTION_CALL);
+        i.setData(Uri.parse("tel:100"));
         if(ContextCompat.checkSelfPermission(getApplicationContext(),CALL_PHONE)== PackageManager.PERMISSION_GRANTED){
             startActivity(i);
         }
