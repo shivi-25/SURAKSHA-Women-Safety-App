@@ -24,7 +24,7 @@
         android:layout_height="94dp"
         android:background="#259F3838"
         android:gravity="center_horizontal"
-        android:text="Women Safety"
+        android:text="SURAKSHA"
         android:textAlignment="center"
         android:textColor="#510C0C"
         android:textSize="40dp"

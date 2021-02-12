@@ -33,6 +33,7 @@ import static android.Manifest.permission.CALL_PHONE;
 
 public class MainActivity2 extends AppCompatActivity {
 
+    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS =0 ;
     Button b1,b2,b3,b4;
     private FusedLocationProviderClient client;
     DatabaseHandler myDB;
@@ -40,7 +41,8 @@ public class MainActivity2 extends AppCompatActivity {
     private LocationSettingsRequest.Builder builder;
     String x="", y="";
     private static final int REQUEST_LOCATION =1;
-
+    String number;
+    String message;
     LocationManager locationManager;
     Intent mIntent;
 
@@ -79,7 +81,7 @@ public class MainActivity2 extends AppCompatActivity {
         b2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //loadData();
+                loadData();
                  call();
             }
         });
@@ -105,28 +107,50 @@ public class MainActivity2 extends AppCompatActivity {
             Toast.makeText(this, "No content to show", Toast.LENGTH_SHORT).show();
         }
         else {
-            String msg="I NEED HELP LATITUDE:" + x+ "LONGITUDE:"+y;
-            String number= "";
-            while(data.moveToNext())
-            {
+           message="I NEED HELP LATITUDE:" + x+ "LONGITUDE:"+y;
+            number= "";
+            while(data.moveToNext()) {
                 thelist.add(data.getString(1));
-                number = number+data.getString(1)+ (data.isLast()?"":";");
-
+                number = data.getString(1);
+                sendSMSMessage();
+                number="";
             }
-           if(!thelist.isEmpty())
-           {
-               sendSms(number,msg,true);
-           }
         }
-        Toast.makeText(this, "bye", Toast.LENGTH_SHORT).show();
     }
 
-    private void sendSms(String number, String msg, boolean b) {
+    protected void sendSMSMessage() {
 
-       Intent smsintent =new Intent(Intent.ACTION_SENDTO);
-        Uri.parse("smsto:"+number);
-        smsintent.putExtra("smsbody",msg);
-        startActivity(smsintent);
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.SEND_SMS)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.SEND_SMS)) {
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.SEND_SMS},
+                        MY_PERMISSIONS_REQUEST_SEND_SMS);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_SEND_SMS: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    SmsManager smsManager = SmsManager.getDefault();
+                    smsManager.sendTextMessage(number, null, message, null, null);
+                    Toast.makeText(getApplicationContext(), "SMS sent.",
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getApplicationContext(),
+                            "SMS faild, please try again.", Toast.LENGTH_LONG).show();
+                    return;
+                }
+            }
+        }
 
     }
 
